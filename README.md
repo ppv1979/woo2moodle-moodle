@@ -1,6 +1,8 @@
 woo2moodle-moodle
 =================
 
+Based on wp2moodle-moodle by Tim St. Clair (https://github.com/frumbert/wp2moodle-moodle)
+
 This is the Moodle-end of a two-part plugin that allows users to authenticate within WordPress and open a Moodle site. To get the Wordpress-end plugin, check this git: https://github.com/ppv1979/woo2moodle-wordpress
 
 Data is encrypted at the Wordpress end and handed over a standard http GET request. Only the minimum required information is sent in order to create a Moodle user record. The user is automatically created if not present at the Moodle end, and then authenticated, and (optionally) enrolled in a Cohort, a Group, or both..

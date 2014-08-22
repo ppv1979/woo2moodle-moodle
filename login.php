@@ -11,8 +11,6 @@
  *
 **/
 
-// error_reporting(E_ALL);
-// ini_set('display_errors', '1');
 
 global $CFG, $USER, $SESSION, $DB;
 
@@ -73,21 +71,11 @@ function truncate_user($userobj) {
 }
 
 $rawdata = $_GET['data'];
-/*$parameters = array();
-if (isset($_SERVER['QUERY_STRING'])) {
-  $pairs = explode('&', $_SERVER['QUERY_STRING']);
-  foreach($pairs as $pair) {
-    $part = explode('=', $pair);
-    $parameters[$part[0]] = urldecode($part[1]);
-    }
-  }
-*/
+
 if (!empty($_GET)) {
-//if (!empty($parameters)) {
 
 	// get the data that was passed in
 	$userdata = decrypt_string($rawdata, $PASSTHROUGH_KEY);
-//	$userdata = decrypt_string($parameters['data'], $PASSTHROUGH_KEY);
 
 	// time (in minutes) before incoming link is considered invalid
 	$timeout = (integer) get_config('auth/woo2moodle', 'timeout');
@@ -117,18 +105,11 @@ if (!empty($_GET)) {
 		// mdl_user.idnumber is the wordpress wp_users.id
 		// TODO: if (get_field('user', 'id', 'username', $username, 'deleted', 1, '')) ----> error since the user is now deleted
 
-    	// if ($user = get_complete_user_data('username', $username)) {}
-        // $auth = empty($user->auth) ? 'manual' : $user->auth;  // use manual if auth not set
-        // if ($auth=='nologin' or !is_enabled_auth($auth)) {}
-        // if the user/password is ok then ensure the record is synched ()
-
 //		if ($DB->record_exists('user', array('username'=>$username))) { // update user
-//			error_log('Trying to update user '.$username);
 			if($auth_type == 'woo')
 				$username = trim(strtolower($email));
 
 			if ($updateuser = get_complete_user_data('username', $username)) { // update user
-//				error_log('Trying to update user '.$username);
 				switch($updateuser->auth){
 					case 'manual':
 					case 'wp2moodle':
@@ -159,27 +140,7 @@ if (!empty($_GET)) {
 						}
 						break;
 				}
-/*				if($updateuser->auth == 'manual' || $updateuser->auth == 'woo2moodle' || $updateuser->auth == 'wp2moodle') { // update manually created user that has the same username
-					if ($updateuser->profile->woo_id == '')
-						$updateuser->profile->woo_id = $idnumber;
-					$updateuser->email = $email;
-					$updateuser->firstname = $firstname;
-					$updateuser->lastname = $lastname;
-					$updateuser->city = $city;
-					$updateuser->country = $country;
-					// don't update password, we don't know it
-					$updateuser->timemodified = time();
-					$updateuser->auth = 'woo2moodle';
-				} else if($updateuser->auth == 'ldap') {
-					if ($updateuser->profile->woo_id == '')
-						$updateuser->profile->woo_id = $idnumber;
-					$updateuser->email = $email;
-					// don't update firstname, it should be updated through ldap only
-					// don't update lastname, it should be updated through ldap only
-					// don't update password, we don't know it
-					$updateuser->timemodified = time();
-				}
-*/
+
 				// make sure we haven't exceeded any field limits
 				$updateuser = truncate_user($updateuser); // typecast obj to array, works just as well
 
@@ -193,13 +154,11 @@ if (!empty($_GET)) {
 			    // Trigger event.
     			\core\event\user_updated::create_from_userid($updateuser->id)->trigger();
 
-//			}	
 				
 				// ensure we have the latest data
 				$user = get_complete_user_data('id', $updateuser->id);
 
 			} else { // create new user
-//				error_log('Trying to create user'.$auth.$username);
 				//code based on moodlelib.create_user_record($username, $password, 'manual')
 				if ($auth_type == 'ldap') 
 					$auth = 'ldap'; // so they log in with ldap plugin
@@ -249,14 +208,11 @@ if (!empty($_GET)) {
 			    $newuser->id = $DB->insert_record('user', $newuser);
 	
 			    $user = get_complete_user_data('id', $newuser->id);
+
 //			    events_trigger('user_created', $DB->get_record('user', array('id'=>$user->id)));
-//				error_log('User created '.$user->username);
 			    // Trigger event.
     			\core\event\user_created::create_from_userid($newuser->id)->trigger();
-
 			}
-
-//		error_log($user->id.' '.$user->username);
 			
 		// if we can find a cohortid matching what we sent in, enrol this user in that cohort by adding a record to cohort_members
 		if (!empty($cohort)) {
@@ -307,17 +263,14 @@ if (!empty($_GET)) {
 			    $authplugin = get_auth_plugin('woo2moodle'); // me!
 				break;
 		}
-/*		if ($auth_type == 'ldap') 
-				$authplugin = get_auth_plugin('ldap'); // so they log in with ldap plugin
-			else if ($auth_type == 'woo') 
-			    $authplugin = get_auth_plugin('woo2moodle'); // me!
-*/		
+
 //	    $authplugin = get_auth_plugin('woo2moodle'); // me!
 		if ($authplugin->user_login($user->username, null)) {
 			$user->loggedin = true;
 			$user->site     = $CFG->wwwroot;
 			complete_user_login($user);
 
+//	        add_to_log(SITEID, 'user', 'login', "view.php?id=$user->id&course=".SITEID,$user->id, 0, $user->id);
 			// Trigger login event.
 		    $event = \core\event\user_loggedin::create(
         		array(
@@ -327,8 +280,6 @@ if (!empty($_GET)) {
         		)                  
 		    );                     
 		    $event->trigger();
-
-//	        add_to_log(SITEID, 'user', 'login', "view.php?id=$user->id&course=".SITEID,$user->id, 0, $user->id);
 		}
 		
 	} else {

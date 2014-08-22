@@ -17,8 +17,7 @@
 /**
  * Version information
  *
- * @package    auth
- * @subpackage woo2moodle
+ * @package    auth_woo2moodle
  * @copyright  2014 Pavel Pisklakov
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * Based on Tim St.Clair's wp2moodle plugin (http://timstclair.me)
@@ -26,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014012100;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011112900;        // Requires this Moodle version
+$plugin->version   = 2014082200;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014051200;        // Requires Moodle 2.7 version
 $plugin->component = 'auth_woo2moodle';       // Full name of the plugin (used for diagnostics)
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = '0.2';

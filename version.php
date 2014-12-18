@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014082200;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2014121900;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2014051200;        // Requires Moodle 2.7 version
 $plugin->component = 'auth_woo2moodle';       // Full name of the plugin (used for diagnostics)
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '0.2';
+$plugin->release = '0.3';

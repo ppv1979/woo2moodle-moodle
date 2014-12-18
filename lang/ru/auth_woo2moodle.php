@@ -36,7 +36,7 @@ $string['auth_woo2moodle_timeout_desc'] = 'Количество минут до 
 $string['auth_woo2moodle_logoffurl'] = 'URL выхода из системы';
 $string['auth_woo2moodle_logoffurl_desc'] = 'URL, на который перенаправляется пользователь при нажатии «Выход»';
 
-$string['auth_woo2moodle_autoopen_desc'] = 'Автоматически открывает первый курс глобальной группы после успешной авторизации';
+$string['auth_woo2moodle_autoopen_desc'] = 'Автоматически открывать курс после успешной  авторизации (используется первая подходящая глобальная группа или простая группа)';
 $string['auth_woo2moodle_autoopen'] = 'Выполнять автоматическое открытие курса?';
 
 $string['auth_woo2moodle_updateuser'] = 'Обновлять поля профиля пользователя, используя значения Wordpress/WooCommerce?';

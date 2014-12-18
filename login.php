@@ -150,8 +150,6 @@ if (!empty($_GET)) {
 				profile_save_data((object) $updateuser);
 
 				// trigger correct update event
-//        	    events_trigger('user_updated', $DB->get_record('user', array('id'=>$updateuser->id)));
-			    // Trigger event.
     			\core\event\user_updated::create_from_userid($updateuser->id)->trigger();
 
 				
@@ -209,8 +207,6 @@ if (!empty($_GET)) {
 	
 			    $user = get_complete_user_data('id', $newuser->id);
 
-//			    events_trigger('user_created', $DB->get_record('user', array('id'=>$user->id)));
-			    // Trigger event.
     			\core\event\user_created::create_from_userid($newuser->id)->trigger();
 			}
 			
@@ -268,18 +264,7 @@ if (!empty($_GET)) {
 		if ($authplugin->user_login($user->username, null)) {
 			$user->loggedin = true;
 			$user->site     = $CFG->wwwroot;
-			complete_user_login($user);
-
-//	        add_to_log(SITEID, 'user', 'login', "view.php?id=$user->id&course=".SITEID,$user->id, 0, $user->id);
-			// Trigger login event.
-		    $event = \core\event\user_loggedin::create(
-        		array(
-            		'userid' => $user->id,
-		            'objectid' => $user->id,
-		            'other' => array('username' => $user->username),
-        		)                  
-		    );                     
-		    $event->trigger();
+			complete_user_login($user); // now performs \core\event\user_loggedin event
 		}
 		
 	} else {

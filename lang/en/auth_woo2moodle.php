@@ -36,7 +36,7 @@ $string['auth_woo2moodle_timeout_desc'] = 'Minutes before incoming link is consi
 $string['auth_woo2moodle_logoffurl'] = 'Logoff Url';
 $string['auth_woo2moodle_logoffurl_desc'] = 'Url to redirect to if the user presses Logoff';
 
-$string['auth_woo2moodle_autoopen_desc'] = 'Automatically open the cohorts first course after successful auth';
+$string['auth_woo2moodle_autoopen_desc'] = 'Automatically open the course after successful auth (uses first match in cohort or group)';
 $string['auth_woo2moodle_autoopen'] = 'Auto open course?';
 
 $string['auth_woo2moodle_updateuser'] = 'Update user profile fields using Wordpress values?';

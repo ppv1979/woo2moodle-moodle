@@ -18,6 +18,7 @@ require('../../config.php');
 require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/group/lib.php');
+require_once($CFG->dirroot.'/user/profile/lib.php');
 
 // logon may somehow modify this
 $SESSION->wantsurl = $CFG->wwwroot.'/';
@@ -89,7 +90,7 @@ if (!empty($_GET)) {
 	
 	if ($timestamp > 0 && $diff <= $timeout) { // less than N minutes passed since this link was created, so it's still ok
 		
-		$username = trim(strtolower(get_key_value($userdata, "username"))); // php's tolower, not moodle's
+		$username = trim(core_text::strtolower(get_key_value($userdata, "username"))); // php's tolower, not moodle's
 		$hashedpassword = get_key_value($userdata, "passwordhash");
 		$firstname = get_key_value($userdata, "firstname"); if (empty($firstname)===true) { $firstname = 'no-firstname'; }
 		$lastname = get_key_value($userdata, "lastname"); if (empty($lastname)===true) { $lastname = 'no-lastname'; }
@@ -107,7 +108,7 @@ if (!empty($_GET)) {
 
 //		if ($DB->record_exists('user', array('username'=>$username))) { // update user
 			if($auth_type == 'woo')
-				$username = trim(strtolower($email));
+				$username = trim(core_text::strtolower($email));
 
 			if ($updateuser = get_complete_user_data('username', $username)) { // update user
 				switch($updateuser->auth){
@@ -115,7 +116,8 @@ if (!empty($_GET)) {
 					case 'wp2moodle':
 					case 'woo2moodle':
 						// update manually created user that has the same username
-						$updateuser->profile['wooid'] = $idnumber;
+//						$updateuser->profile['wooid'] = $idnumber;
+						$updateuser->profile_field_wooid = $idnumber;
 						$updateuser->auth = 'woo2moodle';
 						if ($updatefields) {
 							$updateuser->email = $email;
@@ -128,7 +130,7 @@ if (!empty($_GET)) {
 						break;
 					case 'ldap':
 					case 'univeris':
-						$updateuser->profile['wooid'] = $idnumber;
+						$updateuser->profile_field_wooid = $idnumber;
 						// don't update auth (ldap & univeris are main sources of authentication)						
 						if ($updatefields) {
 							$updateuser->email = $email;
@@ -163,11 +165,14 @@ if (!empty($_GET)) {
 				else if($auth_type == 'woo') 	
 					$auth = 'woo2moodle'; // so they log in with this plugin
 			    $authplugin = get_auth_plugin($auth);
+			    $customfields = $authplugin->get_custom_user_profile_fields();
 			    $newuser = new stdClass();
 				if ($newinfo = $authplugin->get_userinfo($username)) {
 					$newinfo = truncate_user($newinfo);
 					foreach ($newinfo as $key => $value){
-				    	$newuser->$key = $value;
+						if (in_array($key, $authplugin->userfields) || (in_array($key, $customfields))) {
+					    	$newuser->$key = $value;
+				    	}
 					}
 				}
 	
@@ -182,6 +187,7 @@ if (!empty($_GET)) {
 			    $newuser->auth = $auth;
 				$newuser->policyagreed = 1;
 //				$newuser->idnumber = $idnumber;
+				$updateuser->profile_field_wooid = $idnumber;
 			    $newuser->username = $username;
 		        $newuser->password = md5($hashedpassword); // manual auth checks password validity, so we need to set a valid password
 
@@ -201,9 +207,14 @@ if (!empty($_GET)) {
 			    $newuser->mnethostid = $CFG->mnet_localhost_id;
 
 				// make sure we haven't exceeded any field limits
-				$newuser = truncate_user($newuser);
+//				$newuser = truncate_user($newuser);
 	
-			    $newuser->id = $DB->insert_record('user', $newuser);
+//			    $newuser->id = $DB->insert_record('user', $newuser);
+			    
+			    $newuser->id = user_create_user($newuser, false, false);
+			    
+			    //Save user profile data.
+			    profile_save_data($newuser);
 	
 			    $user = get_complete_user_data('id', $newuser->id);
 

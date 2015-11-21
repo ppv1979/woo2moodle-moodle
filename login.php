@@ -19,6 +19,7 @@ require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/group/lib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 
 // logon may somehow modify this
 $SESSION->wantsurl = $CFG->wwwroot.'/';
@@ -160,8 +161,10 @@ if (!empty($_GET)) {
 
 			} else { // create new user
 				//code based on moodlelib.create_user_record($username, $password, 'manual')
-				if ($auth_type == 'ldap') 
-					$auth = 'ldap'; // so they log in with ldap plugin
+				if ($auth_type == 'ldap') {
+					//$auth = 'ldap'; // so they log in with ldap plugin
+					$auth = 'univeris'; // so they log in with univeris plugin
+				}
 				else if($auth_type == 'woo') 	
 					$auth = 'woo2moodle'; // so they log in with this plugin
 			    $authplugin = get_auth_plugin($auth);
@@ -187,7 +190,7 @@ if (!empty($_GET)) {
 			    $newuser->auth = $auth;
 				$newuser->policyagreed = 1;
 //				$newuser->idnumber = $idnumber;
-				$updateuser->profile_field_wooid = $idnumber;
+				$newuser->profile_field_wooid = $idnumber;
 			    $newuser->username = $username;
 		        $newuser->password = md5($hashedpassword); // manual auth checks password validity, so we need to set a valid password
 
@@ -264,7 +267,8 @@ if (!empty($_GET)) {
 		// all that's left to do is to authenticate this user and set up their active session
 		switch($auth_type){
 			case 'ldap':
-				$authplugin = get_auth_plugin('ldap'); // so they log in with ldap plugin
+				//$authplugin = get_auth_plugin('ldap'); // so they log in with ldap plugin
+				$authplugin = get_auth_plugin('univeris'); // so they log in with univeris plugin
 				break;
 			case 'woo':
 			    $authplugin = get_auth_plugin('woo2moodle'); // me!
@@ -272,7 +276,7 @@ if (!empty($_GET)) {
 		}
 
 //	    $authplugin = get_auth_plugin('woo2moodle'); // me!
-		if ($authplugin->user_login($user->username, null)) {
+		if ($authplugin->user_login($user->username, $user->password)) {
 			$user->loggedin = true;
 			$user->site     = $CFG->wwwroot;
 			complete_user_login($user); // now performs \core\event\user_loggedin event
